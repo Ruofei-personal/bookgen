@@ -1,0 +1,16 @@
+# OpenClaw local state
+.openclaw/
+
+# InkOS local secrets / generated runtime
+inkos-project/.env
+inkos-project/books/
+inkos-project/story/
+inkos-project/.tmp/
+inkos-project/logs/
+
+# Node / Python noise
+node_modules/
+__pycache__/
+*.pyc
+.env
+.DS_Store
