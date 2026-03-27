@@ -1,16 +1,24 @@
-# OpenClaw local state
-.openclaw/
-
-# InkOS local secrets / generated runtime
-inkos-project/.env
-inkos-project/books/
-inkos-project/story/
-inkos-project/.tmp/
-inkos-project/logs/
-
-# Node / Python noise
-node_modules/
+# Python
 __pycache__/
+**/__pycache__/
 *.pyc
+**/*.pyc
+.venv/
+backend/.venv/
+
+# Node / Next
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+
+# Env
 .env
+.env.*
+!.env.example
+
+# Native deploy PID / logs (scripts/native-start.sh)
+.run/
+
+# OS
 .DS_Store

@@ -1,0 +1,98 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@400;500;600&display=swap");
+@import "tailwindcss";
+
+:root {
+  --background: #fafaf9;
+  --foreground: #1c1917;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0c0a09;
+    --foreground: #fafaf9;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Reading column: comfortable line length and spacing */
+.novel-prose {
+  font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+}
+
+.novel-prose :where(p) {
+  margin-bottom: 1.25em;
+}
+
+.novel-prose :where(h1, h2, h3, h4) {
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 600;
+  margin-top: 1.75em;
+  margin-bottom: 0.75em;
+  line-height: 1.35;
+}
+
+.novel-prose :where(h1) {
+  font-size: 1.5rem;
+}
+
+.novel-prose :where(h2) {
+  font-size: 1.25rem;
+}
+
+.novel-prose :where(h3) {
+  font-size: 1.1rem;
+}
+
+.novel-prose :where(blockquote) {
+  border-left: 3px solid rgb(161 161 170);
+  padding-left: 1em;
+  color: rgb(82 82 91);
+  margin: 1.25em 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .novel-prose :where(blockquote) {
+    border-left-color: rgb(113 113 122);
+    color: rgb(161 161 170);
+  }
+}
+
+.novel-prose :where(ul, ol) {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.novel-prose :where(li) {
+  margin-bottom: 0.35em;
+}
+
+.novel-prose :where(pre) {
+  overflow-x: auto;
+  padding: 1em;
+  border-radius: 0.5rem;
+  background: rgb(244 244 245);
+  font-size: 0.9em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .novel-prose :where(pre) {
+    background: rgb(39 39 42);
+  }
+}
+
+.novel-prose :where(code) {
+  font-size: 0.9em;
+}

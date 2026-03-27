@@ -1,0 +1,27 @@
+services:
+  api:
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./content:/app/content:ro
+    environment:
+      CONTENT_ROOT: /app/content/books
+      CORS_ORIGINS: "http://localhost:8765,http://127.0.0.1:8765"
+
+  web:
+    restart: unless-stopped
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        API_URL: http://api:8001
+    ports:
+      - "8765:8765"
+    environment:
+      API_URL: http://api:8001
+    depends_on:
+      - api
