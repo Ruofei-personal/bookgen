@@ -27,3 +27,10 @@ if [ -f "$RUN/last-start.json" ]; then
   echo "== last-start.json =="
   cat "$RUN/last-start.json"
 fi
+
+echo
+for unit in bookgen-api.service bookgen-web.service; do
+  echo "== $unit =="
+  systemctl --user status "$unit" --no-pager 2>/dev/null | sed -n '1,20p' || echo "not found"
+  echo
+ done

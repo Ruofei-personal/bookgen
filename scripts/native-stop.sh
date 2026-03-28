@@ -52,6 +52,8 @@ kill_port_holders() {
 mkdir -p "$RUN"
 stop_one "API" "api.pid"
 stop_one "frontend" "web.pid"
+systemctl --user stop bookgen-api.service 2>/dev/null || true
+systemctl --user stop bookgen-web.service 2>/dev/null || true
 kill_port_holders 8001 "API"
 kill_port_holders 8765 "frontend"
 echo "native-stop: done."

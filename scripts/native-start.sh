@@ -29,13 +29,25 @@ echo "native-start: stopping previous bookgen native processes (if any)..."
 
 echo "native-start: starting API on :8001 (log $RUN/api.log)"
 cd "$ROOT/backend"
-nohup uv run uvicorn app.main:app --host 0.0.0.0 --port 8001 >>"$RUN/api.log" 2>&1 &
-echo $! >"$RUN/api.pid"
+systemd-run --user --unit=bookgen-api --same-dir --collect --quiet \
+  --setenv=PATH=$PATH \
+  --setenv=HOME=$HOME \
+  --setenv=PYTHONUNBUFFERED=1 \
+  bash -lc 'exec uv run uvicorn app.main:app --host 0.0.0.0 --port 8001 >>"$0" 2>&1' "$RUN/api.log"
+sleep 1
+systemctl --user show bookgen-api --property MainPID --value >"$RUN/api.pid"
 
 echo "native-start: starting Next standalone server on :8765 (log $RUN/web.log), API_URL=$API_URL"
 cd "$ROOT/frontend"
-nohup env API_URL="$API_URL" HOSTNAME="0.0.0.0" PORT="8765" node .next/standalone/server.js >>"$RUN/web.log" 2>&1 &
-echo $! >"$RUN/web.pid"
+systemd-run --user --unit=bookgen-web --same-dir --collect --quiet \
+  --setenv=PATH=$PATH \
+  --setenv=HOME=$HOME \
+  --setenv=API_URL=$API_URL \
+  --setenv=HOSTNAME=0.0.0.0 \
+  --setenv=PORT=8765 \
+  bash -lc 'exec node .next/standalone/server.js >>"$0" 2>&1' "$RUN/web.log"
+sleep 1
+systemctl --user show bookgen-web --property MainPID --value >"$RUN/web.pid"
 
 cat >"$RUN/last-start.json" <<EOF
 {
@@ -44,7 +56,9 @@ cat >"$RUN/last-start.json" <<EOF
   "webPid": $(cat "$RUN/web.pid"),
   "apiUrl": "$API_URL",
   "apiLog": "$RUN/api.log",
-  "webLog": "$RUN/web.log"
+  "webLog": "$RUN/web.log",
+  "apiUnit": "bookgen-api.service",
+  "webUnit": "bookgen-web.service"
 }
 EOF
 
