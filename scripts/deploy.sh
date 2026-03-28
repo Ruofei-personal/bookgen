@@ -64,6 +64,9 @@ fi
 echo "bookgen deploy: [native] 构建 frontend + 校验 backend venv..."
 "$ROOT/scripts/build.sh"
 
+echo "bookgen deploy: [native] 清理旧进程并准备干净重启..."
+"$ROOT/scripts/native-stop.sh"
+
 if [ -n "${BOOKGEN_NATIVE_RESTART_CMD:-}" ]; then
   echo "bookgen deploy: [native] 执行 BOOKGEN_NATIVE_RESTART_CMD..."
   bash -c "$BOOKGEN_NATIVE_RESTART_CMD"

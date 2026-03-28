@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# 停止由 native-start.sh 记录在本仓库 .run/ 下的 API / 前端进程（仅针对 bookgen 脚本启动的实例）。
+# 停止由 native-start.sh 记录在本仓库 .run/ 下的 API / 前端进程。
+# 同时兜底清理仍占用 8001/8765 的 bookgen 相关残留进程，避免端口被旧实例卡住。
 #
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -28,7 +29,29 @@ stop_one() {
   rm -f "$pidfile"
 }
 
+kill_port_holders() {
+  local port="$1"
+  local label="$2"
+  local pids
+  pids="$(ss -tlnp 2>/dev/null | awk -v p=":$port" '$4 ~ p {print $NF}' | grep -o 'pid=[0-9]\+' | cut -d= -f2 | sort -u || true)"
+  if [ -z "$pids" ]; then
+    return 0
+  fi
+  for pid in $pids; do
+    if [ -r "/proc/$pid/cwd" ]; then
+      local cwd
+      cwd="$(readlink -f "/proc/$pid/cwd" 2>/dev/null || true)"
+      if [[ "$cwd" == "$ROOT"/* || "$cwd" == "$ROOT" ]]; then
+        echo "native-stop: killing leftover $label listener on :$port (pid $pid, cwd $cwd)"
+        kill -9 "$pid" 2>/dev/null || true
+      fi
+    fi
+  done
+}
+
 mkdir -p "$RUN"
 stop_one "API" "api.pid"
 stop_one "frontend" "web.pid"
+kill_port_holders 8001 "API"
+kill_port_holders 8765 "frontend"
 echo "native-stop: done."
