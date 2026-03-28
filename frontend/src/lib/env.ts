@@ -14,6 +14,7 @@ export function getApiBase(): string {
 export function assetUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  if (path.startsWith("/")) return path;
-  return `/${path}`;
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  if (normalized.startsWith("/content/")) return normalized;
+  return normalized;
 }

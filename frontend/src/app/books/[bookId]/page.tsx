@@ -23,7 +23,7 @@ export default async function BookDetailPage({ params }: Props) {
   if (!data) notFound();
 
   const { book, chapters } = data;
-  const coverSrc = assetUrl(book.cover);
+  const coverSrc = book.cover?.startsWith("/content/") ? book.cover : assetUrl(book.cover);
   const statusLabel = book.status === "completed" ? "完结" : "连载";
 
   return (
