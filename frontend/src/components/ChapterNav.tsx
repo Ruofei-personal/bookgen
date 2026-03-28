@@ -12,12 +12,13 @@ export function ChapterNav({
 }) {
   const base = `/books/${bookId}`;
   return (
-    <nav className="mt-10 flex flex-col gap-3 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
-      <div className="min-h-[1.5rem]">
+    <nav className="mt-10 grid grid-cols-3 items-center gap-3 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800">
+      <div className="min-h-[1.5rem] text-left">
         {prev ? (
           <Link
             href={`${base}/chapters/${prev.slug}`}
-            className="text-zinc-700 hover:underline dark:text-zinc-300"
+            className="inline-block max-w-full truncate text-zinc-700 hover:underline dark:text-zinc-300"
+            title={`上一章：${prev.title}`}
           >
             ← 上一章：{prev.title}
           </Link>
@@ -35,7 +36,8 @@ export function ChapterNav({
         {next ? (
           <Link
             href={`${base}/chapters/${next.slug}`}
-            className="text-zinc-700 hover:underline dark:text-zinc-300"
+            className="inline-block max-w-full truncate text-zinc-700 hover:underline dark:text-zinc-300"
+            title={`下一章：${next.title}`}
           >
             下一章：{next.title} →
           </Link>
