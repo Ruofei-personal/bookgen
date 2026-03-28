@@ -11,7 +11,7 @@ try:
     import edge_tts
 except ImportError as exc:  # pragma: no cover - runtime guidance only
     raise SystemExit(
-        "缺少 edge-tts 依赖，请先在 backend 目录执行 `uv sync`。"
+        "缺少 edge-tts 依赖，请使用 `cd backend && uv sync` 安装后，通过 `cd backend && uv run ../scripts/generate_tts.py ...` 运行。"
     ) from exc
 
 DEFAULT_VOICE = "zh-CN-XiaoxiaoNeural"
