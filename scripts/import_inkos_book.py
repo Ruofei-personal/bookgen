@@ -89,6 +89,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--status", default="ongoing", choices=["ongoing", "completed"], help="Book status")
     parser.add_argument("--tags", nargs="*", default=[], help="Book tags")
     parser.add_argument("--replace", action="store_true", help="Replace target book directory before import")
+    parser.add_argument("--chapters-only", action="store_true", help="Only sync chapters/meta and preserve existing public book metadata/assets")
     return parser.parse_args()
 
 
@@ -130,7 +131,7 @@ def main() -> int:
     if not chapters:
         raise SystemExit(f"No chapter files found under: {inkos_book_dir / 'chapters'}")
 
-    if target_dir.exists() and args.replace:
+    if target_dir.exists() and args.replace and not args.chapters_only:
         shutil.rmtree(target_dir)
 
     (target_dir / "chapters").mkdir(parents=True, exist_ok=True)
@@ -141,19 +142,28 @@ def main() -> int:
     description = build_description(inkos_book_dir, args.description)
 
     latest = chapters[-1]
-    book_json = {
-        "id": book_id,
-        "title": title,
-        "author": args.author,
-        "description": description,
-        "status": args.status,
-        "tags": args.tags,
-        "cover": None,
-        "created_at": book_info.get("createdAt") or timestamp,
-        "updated_at": timestamp,
-        "latest_chapter_title": latest["title"],
-        "latest_chapter_number": latest["number"],
-    }
+    existing_book_json_path = target_dir / "book.json"
+    existing_book_json = read_json(existing_book_json_path) if existing_book_json_path.is_file() else None
+
+    if args.chapters_only and existing_book_json:
+        book_json = dict(existing_book_json)
+        book_json["updated_at"] = timestamp
+        book_json["latest_chapter_title"] = latest["title"]
+        book_json["latest_chapter_number"] = latest["number"]
+    else:
+        book_json = {
+            "id": book_id,
+            "title": title,
+            "author": args.author,
+            "description": description,
+            "status": args.status,
+            "tags": args.tags,
+            "cover": existing_book_json.get("cover") if existing_book_json else None,
+            "created_at": book_info.get("createdAt") or timestamp,
+            "updated_at": timestamp,
+            "latest_chapter_title": latest["title"],
+            "latest_chapter_number": latest["number"],
+        }
     write_json(target_dir / "book.json", book_json)
 
     for chapter in chapters:
