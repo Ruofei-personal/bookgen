@@ -162,6 +162,7 @@ class ContentService:
                 created_at=c.created_at,
                 updated_at=c.updated_at,
                 summary=c.summary,
+                audio=c.audio,
             )
             for c in chs
         ]
