@@ -8,9 +8,9 @@ export function getApiBase(): string {
 }
 
 /** URL for static assets and images served by the API (e.g. /content/...).
- * These assets live on the FastAPI service, not the Next.js frontend server.
- * Use API_BASE for root-relative content paths so external browsers don't hit
- * localhost while still reaching the correct host/port.
+ * In the current native deployment, /content is served by FastAPI on the API
+ * host/port instead of the Next.js frontend port, so content paths must be
+ * expanded against API_BASE.
  */
 export function assetUrl(path: string | null | undefined): string | null {
   if (!path) return null;
