@@ -40,6 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--title", help="Public title")
     parser.add_argument("--author", help="Public author")
     parser.add_argument("--description", help="Public description")
+    parser.add_argument("--description-file", help="Read public description from a UTF-8 text file")
     parser.add_argument("--tags", nargs="*", default=None, help="Public tags")
     parser.add_argument("--cover", help="Path to cover image file to copy into assets/cover.*")
     parser.add_argument("--status", default="ongoing", choices=["ongoing", "completed"], help="Book status")
@@ -73,8 +74,15 @@ def main() -> int:
         book_json["title"] = args.title
     if args.author:
         book_json["author"] = args.author
-    if args.description:
-        book_json["description"] = args.description
+
+    description_value = None
+    if args.description_file:
+        description_value = Path(args.description_file).resolve().read_text(encoding="utf-8").strip()
+    elif args.description:
+        description_value = args.description
+    if description_value is not None:
+        book_json["description"] = description_value
+
     if args.tags is not None:
         book_json["tags"] = args.tags
     if args.status:
