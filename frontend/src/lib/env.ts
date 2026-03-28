@@ -7,9 +7,13 @@ export function getApiBase(): string {
   );
 }
 
-/** Absolute URL for static assets and images served by the API (e.g. /content/...). */
+/** URL for static assets and images served by the API (e.g. /content/...).
+ * Prefer root-relative paths in rendered HTML so external browsers do not see
+ * server-local origins like 127.0.0.1.
+ */
 export function assetUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  return `${getApiBase()}${path.startsWith("/") ? path : `/${path}`}`;
+  if (path.startsWith("/")) return path;
+  return `/${path}`;
 }
