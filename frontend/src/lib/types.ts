@@ -22,6 +22,7 @@ export interface ChapterListItem {
   created_at: string | null;
   updated_at: string | null;
   summary: string | null;
+  audio: string | null;
 }
 
 export interface BooksListResponse {
@@ -42,6 +43,7 @@ export interface ChapterMeta {
   created_at: string | null;
   updated_at: string | null;
   summary: string | null;
+  audio: string | null;
 }
 
 export interface ChapterReadBody {
