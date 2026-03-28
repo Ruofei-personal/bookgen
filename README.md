@@ -184,6 +184,9 @@ content/books/<book-id>/
   meta/
     001.json
     002.json
+  audio/
+    001.mp3
+    002.mp3
   assets/
     cover.jpg
 ```
@@ -200,8 +203,39 @@ content/books/<book-id>/
 1. 在 `meta/` 增加 `00N.json`（`number`、`slug`、`title` 等与 `001.json` 同结构）。
 2. 在 `chapters/` 增加对应 `00N.md`（Markdown 正文）。
 3. 按章节号递增；目录顺序由 `meta` 中 `number` 排序决定。
+4. 如果该章节有预生成音频，可在 `meta/00N.json` 增加可选字段 `"audio": "/content/books/<book-id>/audio/00N.mp3"`。
 
 保存文件后无需数据库迁移；刷新页面即可看到更新（前端有短时 revalidate，必要时强刷）。
+
+## 章节 TTS（edge-tts，预生成）
+
+第一版 TTS 采用离线预生成：通过脚本生成 `audio/*.mp3`，并写回对应章节 `meta/*.json` 的 `audio` 字段。前端章节页检测到该字段后会显示原生播放器。
+
+先安装后端依赖（含 `edge-tts`）：
+
+```bash
+cd backend
+uv sync
+```
+
+在仓库根目录执行生成脚本：
+
+```bash
+# 单章生成（示例：第 1 章）
+uv run --project backend python scripts/generate_tts.py \
+  --book-id city-test-begins \
+  --chapter 1
+
+# 整本生成
+uv run --project backend python scripts/generate_tts.py \
+  --book-id city-test-begins \
+  --all
+```
+
+可选参数：
+
+- `--voice`：指定 edge-tts 音色（默认 `zh-CN-XiaoxiaoNeural`）
+- `--overwrite`：覆盖已有 mp3（默认跳过已存在文件）
 
 ## API（只读）
 

@@ -31,6 +31,7 @@ class ChapterMeta(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     summary: str | None = None
+    audio: str | None = None
 
 
 class ChapterListItem(BaseModel):
@@ -41,6 +42,7 @@ class ChapterListItem(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     summary: str | None = None
+    audio: str | None = None
 
 
 class NavChapter(BaseModel):

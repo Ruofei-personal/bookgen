@@ -37,6 +37,14 @@ export default async function ChapterPage({ params }: Props) {
         {chapter.meta.summary ? (
           <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{chapter.meta.summary}</p>
         ) : null}
+        {chapter.meta.audio ? (
+          <div className="mt-4">
+            <audio controls preload="none" className="w-full">
+              <source src={chapter.meta.audio} type="audio/mpeg" />
+              您的浏览器暂不支持音频播放。
+            </audio>
+          </div>
+        ) : null}
       </header>
 
       <ArticleBody html={chapter.content_html} />
