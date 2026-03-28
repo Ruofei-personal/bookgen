@@ -21,9 +21,9 @@ cd "$ROOT/backend"
 nohup uv run uvicorn app.main:app --host 0.0.0.0 --port 8001 >>"$RUN/api.log" 2>&1 &
 echo $! >"$RUN/api.pid"
 
-echo "native-start: starting Next on :8765 (log $RUN/web.log), API_URL=$API_URL"
+echo "native-start: starting Next standalone server on :8765 (log $RUN/web.log), API_URL=$API_URL"
 cd "$ROOT/frontend"
-nohup env API_URL="$API_URL" npm run start >>"$RUN/web.log" 2>&1 &
+nohup env API_URL="$API_URL" HOSTNAME="0.0.0.0" PORT="8765" node .next/standalone/server.js >>"$RUN/web.log" 2>&1 &
 echo $! >"$RUN/web.pid"
 
 echo "native-start: PIDs api=$(cat "$RUN/api.pid") web=$(cat "$RUN/web.pid")"
