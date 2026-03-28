@@ -11,6 +11,17 @@ RUN="$ROOT/.run"
 mkdir -p "$RUN"
 
 export API_URL="${API_URL:-http://127.0.0.1:8001}"
+STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+rotate_log() {
+  local file="$1"
+  if [ -f "$file" ] && [ -s "$file" ]; then
+    mv "$file" "$file.$(date +%Y%m%d-%H%M%S)"
+  fi
+}
+
+rotate_log "$RUN/api.log"
+rotate_log "$RUN/web.log"
 
 echo "native-start: repo=$ROOT"
 echo "native-start: stopping previous bookgen native processes (if any)..."
@@ -26,5 +37,17 @@ cd "$ROOT/frontend"
 nohup env API_URL="$API_URL" HOSTNAME="0.0.0.0" PORT="8765" node .next/standalone/server.js >>"$RUN/web.log" 2>&1 &
 echo $! >"$RUN/web.pid"
 
+cat >"$RUN/last-start.json" <<EOF
+{
+  "startedAt": "$STARTED_AT",
+  "apiPid": $(cat "$RUN/api.pid"),
+  "webPid": $(cat "$RUN/web.pid"),
+  "apiUrl": "$API_URL",
+  "apiLog": "$RUN/api.log",
+  "webLog": "$RUN/web.log"
+}
+EOF
+
 echo "native-start: PIDs api=$(cat "$RUN/api.pid") web=$(cat "$RUN/web.pid")"
+echo "native-start: start metadata written to $RUN/last-start.json"
 echo "native-start: Next.js 首次监听可能需要十余秒，请用 ./scripts/check.sh 验证（内置重试）。"
