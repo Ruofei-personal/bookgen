@@ -19,6 +19,10 @@ content/books/<book-id>/
     001.json             # 第 1 章元数据（建议文件名与章节号对齐）
     002.json
     ...
+  audio/                 # 可选：章节预生成音频（mp3）
+    001.mp3
+    002.mp3
+    ...
   assets/                # 可选：封面等静态资源
     cover.jpg
 ```
@@ -62,6 +66,7 @@ content/books/<book-id>/
 | `created_at` | string \| null | 否 | ISO 8601。 |
 | `updated_at` | string \| null | 否 | ISO 8601；建议章节有改动时更新。 |
 | `summary` | string \| null | 否 | 摘要，可选。 |
+| `audio` | string \| null | 否 | 章节音频 URL（预生成 mp3），建议使用 `/content/books/<book-id>/audio/NNN.mp3`。 |
 
 **同一本书内 `slug` 必须唯一**；若重复，解析时以**先匹配到的一条**为准（应避免重复）。
 
@@ -111,7 +116,8 @@ content/books/<book-id>/
 1. `content/books/<id>/` 存在且 **`id` 与目录名一致**。  
 2. `book.json` 合法 JSON，**`status` 仅 `ongoing` 或 `completed`**。  
 3. 新章：在 `meta/` 增加 `NNN.json`，在 `chapters/` 增加 **`NNN.md`**，`number` 与文件名一致，`slug` 唯一。  
-4. 更新 **`book.json` 的 `updated_at`**（及可选 `latest_*` 或依赖后端自动补全）。  
-5. 部署后可用仓库根目录 **`./scripts/check.sh`** 做健康检查（见主 `README.md`）。
+4. 需要语音时：预生成 `audio/NNN.mp3`，并在 `meta/NNN.json` 写入 `"audio": "/content/books/<book-id>/audio/NNN.mp3"`。  
+5. 更新 **`book.json` 的 `updated_at`**（及可选 `latest_*` 或依赖后端自动补全）。  
+6. 部署后可用仓库根目录 **`./scripts/check.sh`** 做健康检查（见主 `README.md`）。
 
 更宏观的产品说明见仓库根目录 **`novel-site-spec.md`**。

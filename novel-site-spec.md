@@ -109,6 +109,9 @@ content/
       meta/
         001.json
         002.json
+      audio/
+        001.mp3
+        002.mp3
       assets/
         cover.jpg
 ```
@@ -139,6 +142,7 @@ content/
 - `created_at`
 - `updated_at`
 - `summary`（可选）
+- `audio`（可选，示例：`/content/books/<book-id>/audio/001.mp3`，仅预生成文件）
 
 ### 章节正文
 - 使用 Markdown
