@@ -7,10 +7,10 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    default: "bookgen",
-    template: "%s · bookgen",
+    default: "书荒救星",
+    template: "%s · 书荒救星",
   },
-  description: "极简小说阅读与发布",
+  description: "书荒救星：极简小说阅读与更新追更",
 };
 
 export default function RootLayout({
@@ -20,9 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen antialiased">
+      <body className="min-h-screen bg-zinc-50 antialiased dark:bg-zinc-950">
         <SiteHeader />
-        <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+        <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       </body>
     </html>
   );
