@@ -8,13 +8,14 @@ export function getApiBase(): string {
 }
 
 /** URL for static assets and images served by the API (e.g. /content/...).
- * Prefer root-relative paths in rendered HTML so external browsers do not see
- * server-local origins like 127.0.0.1.
+ * These assets live on the FastAPI service, not the Next.js frontend server.
+ * Use API_BASE for root-relative content paths so external browsers don't hit
+ * localhost while still reaching the correct host/port.
  */
 export function assetUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  if (normalized.startsWith("/content/")) return normalized;
+  if (normalized.startsWith("/content/")) return `${getApiBase()}${normalized}`;
   return normalized;
 }
