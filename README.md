@@ -207,27 +207,34 @@ content/books/<book-id>/
 
 保存文件后无需数据库迁移；刷新页面即可看到更新（前端有短时 revalidate，必要时强刷）。
 
-## 章节 TTS（edge-tts，预生成）
+## 章节 TTS（edge-tts + ffmpeg，预生成）
 
-第一版 TTS 采用离线预生成：通过脚本生成 `audio/*.mp3`，并写回对应章节 `meta/*.json` 的 `audio` 字段。前端章节页检测到该字段后会显示原生播放器。
+TTS 采用离线预生成：脚本先用 `edge-tts` 生成原始语音，再用 `ffmpeg` 转码为网页兼容性更高的 MP3（`44.1kHz / 128kbps / 双声道`），最后写回章节 `meta/*.json` 的 `audio` 字段。前端章节页检测到该字段后会显示原生播放器。
 
-先安装后端依赖（含 `edge-tts`）：
+运行前提：
+
+- 已安装后端 Python 依赖（含 `edge-tts`）
+- 系统已安装 `ffmpeg`（脚本启动会检查，缺失时直接报错并提示安装）
+
+先安装后端依赖：
 
 ```bash
 cd backend
 uv sync
 ```
 
-在仓库根目录执行生成脚本：
+推荐从 `backend/` 目录执行脚本：
 
 ```bash
 # 单章生成（示例：第 1 章）
-uv run --project backend python scripts/generate_tts.py \
+cd backend
+uv run ../scripts/generate_tts.py \
   --book-id city-test-begins \
-  --chapter 1
+  --chapter 1 \
+  --overwrite
 
 # 整本生成
-uv run --project backend python scripts/generate_tts.py \
+uv run ../scripts/generate_tts.py \
   --book-id city-test-begins \
   --all
 ```

@@ -5,6 +5,8 @@ import argparse
 import asyncio
 import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 try:
@@ -56,6 +58,38 @@ async def _synthesize(text: str, target_file: Path, voice: str) -> None:
     await communicate.save(str(target_file))
 
 
+def _ensure_ffmpeg() -> None:
+    if shutil.which("ffmpeg"):
+        return
+    raise SystemExit(
+        "缺少 ffmpeg：当前 TTS 流程依赖 ffmpeg 对 edge-tts 输出做网页兼容性转码。"
+        "请先安装 ffmpeg 后再重试。"
+    )
+
+
+def _normalize_audio(raw_file: Path, target_file: Path) -> None:
+    target_file.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(raw_file),
+        "-codec:a",
+        "libmp3lame",
+        "-ar",
+        "44100",
+        "-ac",
+        "2",
+        "-b:a",
+        "128k",
+        str(target_file),
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        message = proc.stderr.strip() or proc.stdout.strip() or "未知错误"
+        raise RuntimeError(f"ffmpeg 转码失败: {message}")
+
+
 def _update_meta_audio(meta_path: Path, audio_url: str) -> None:
     data = json.loads(meta_path.read_text(encoding="utf-8"))
     if data.get("audio") == audio_url:
@@ -97,10 +131,22 @@ def _generate_for_one(book_id: str, chapter_token: str, voice: str, overwrite: b
     if not tts_text:
         raise ValueError(f"章节 {chapter_token} 清洗后为空，停止生成。")
 
-    print(f"[tts] 生成 {book_id}/{chapter_token} -> {audio_path}")
-    asyncio.run(_synthesize(tts_text, audio_path, voice))
+    raw_audio_path = audio_path.with_suffix(".raw.mp3")
+    if raw_audio_path.exists():
+        raw_audio_path.unlink()
+
+    print(f"[tts] 生成原始音频 {book_id}/{chapter_token} -> {raw_audio_path}")
+    asyncio.run(_synthesize(tts_text, raw_audio_path, voice))
+    print(f"[tts] 原始生成成功: {raw_audio_path}")
+
+    print(f"[ffmpeg] 转码标准化 -> {audio_path}")
+    _normalize_audio(raw_audio_path, audio_path)
+    print(f"[ffmpeg] 转码成功: {audio_path}")
+
+    raw_audio_path.unlink(missing_ok=True)
     _update_meta_audio(meta_path, audio_url)
-    print(f"[ok] 已写入音频与 meta: {audio_url}")
+    print(f"[meta] 已更新: {meta_path}")
+    print(f"[ok] 已写入兼容音频与 meta: {audio_url}")
 
 
 def main() -> None:
@@ -118,6 +164,8 @@ def main() -> None:
     book_dir = BOOKS_ROOT / args.book_id
     if not book_dir.is_dir():
         raise SystemExit(f"书籍不存在: {book_dir}")
+
+    _ensure_ffmpeg()
 
     targets = _resolve_targets(book_dir, args.chapter, args.all)
     if not targets:
