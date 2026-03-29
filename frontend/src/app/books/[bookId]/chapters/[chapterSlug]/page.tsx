@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/ArticleBody";
 import { ChapterNav } from "@/components/ChapterNav";
 import { fetchBook, fetchChapter } from "@/lib/api";
+import { assetUrl } from "@/lib/env";
 
 type Props = { params: Promise<{ bookId: string; chapterSlug: string }> };
 
@@ -26,6 +27,7 @@ export default async function ChapterPage({ params }: Props) {
   if (!data) notFound();
 
   const { chapter, prev, next } = data;
+  const audioSrc = assetUrl(chapter.meta.audio);
 
   return (
     <article>
@@ -37,10 +39,9 @@ export default async function ChapterPage({ params }: Props) {
         {chapter.meta.summary ? (
           <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{chapter.meta.summary}</p>
         ) : null}
-        {chapter.meta.audio ? (
+        {audioSrc ? (
           <div className="mt-4">
-            <audio controls preload="none" className="w-full">
-              <source src={chapter.meta.audio} type="audio/mpeg" />
+            <audio controls preload="none" className="w-full" src={audioSrc}>
               您的浏览器暂不支持音频播放。
             </audio>
           </div>
